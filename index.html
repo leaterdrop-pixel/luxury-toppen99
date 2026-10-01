@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Video Site</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    background:#111;
+    color:#fff;
+    font-family:Arial,sans-serif;
+}
+
+#ageGate,
+#adScreen,
+#blocked{
+    position:fixed;
+    inset:0;
+    background:#111;
+    z-index:9999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+
+.box{
+    width:90%;
+    max-width:450px;
+    background:#222;
+    padding:30px;
+    border-radius:12px;
+}
+
+button{
+    padding:12px 24px;
+    margin:8px;
+    border:0;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.yes{
+    background:#16a34a;
+    color:white;
+}
+
+.no{
+    background:#dc2626;
+    color:white;
+}
+
+#adScreen,
+#blocked{
+    display:none;
+}
+
+.adBox{
+    width:90%;
+    max-width:500px;
+    height:250px;
+    border:1px dashed #777;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:20px auto;
+}
+
+#continueBtn{
+    display:none;
+}
+
+#site{
+    display:none;
+}
+
+header{
+    padding:20px;
+    text-align:center;
+    background:#1c1c1c;
+}
+
+.videos{
+    width:94%;
+    max-width:900px;
+    margin:20px auto;
+}
+
+.videoCard{
+    background:#202020;
+    margin-bottom:20px;
+    padding:12px;
+    border-radius:10px;
+}
+
+video{
+    width:100%;
+    display:block;
+    background:#000;
+}
+</style>
+</head>
+
+<body>
+
+<!-- AGE SCREEN -->
+<div id="ageGate">
+    <div class="box">
+        <h2>Are you 18 years old?</h2>
+        <p>Please confirm your age to continue.</p>
+
+        <button class="yes" onclick="ageYes()">YES</button>
+        <button class="no" onclick="ageNo()">NO</button>
+    </div>
+</div>
+
+
+<!-- BLOCKED SCREEN -->
+<div id="blocked">
+    <div class="box">
+        <h2>Access Denied</h2>
+        <p>You cannot continue.</p>
+    </div>
+</div>
+
+
+<!-- AD SCREEN -->
+<div id="adScreen">
+    <div class="box">
+
+        <h2>Advertisement</h2>
+
+        <!-- আসল Ad Network code এখানে বসাবে -->
+        <div class="adBox">
+            ADVERTISEMENT
+        </div>
+
+        <p id="adTimer">Please wait 5 seconds...</p>
+
+        <button id="continueBtn" onclick="finishAd()">
+            Continue
+        </button>
+
+    </div>
+</div>
+
+
+<!-- WEBSITE -->
+<div id="site">
+
+<header>
+    <h1>My Video Website</h1>
+</header>
+
+<div class="videos">
+
+    <!-- VIDEO 1 -->
+    <div class="videoCard">
+        <video controls class="myVideo">
+            <source src="https://files.catbox.moe/gmo7u2.mp4" type="video/mp4">
+        </video>
+        <h3>Video 01</h3>
+    </div>
+
+
+    <!-- VIDEO 2 -->
+    <div class="videoCard">
+        <video controls class="myVideo">
+            <source src="https://files.catbox.moe/5ag5rz.mp4" type="video/mp4">
+        </video>
+        <h3>Video 02</h3>
+    </div>
+
+
+    <!-- VIDEO 3 -->
+    <div class="videoCard">
+        <video controls class="myVideo">
+            <source src="https://files.catbox.moe/12zx03.mp4" type="video/mp4">
+        </video>
+        <h3>Video 03</h3>
+    </div>
+
+
+    <!-- VIDEO 4 -->
+    <div class="videoCard">
+        <video controls class="myVideo">
+            <source src="https://files.catbox.moe/nusg1y.mp4" type="video/mp4">
+        </video>
+        <h3>Video 04</h3>
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+let adAction = "";
+let selectedVideo = null;
+
+
+/* YES */
+function ageYes(){
+
+    document.getElementById("ageGate").style.display="none";
+
+    document.getElementById("site").style.display="block";
+
+    showAd("entry");
+}
+
+
+/* NO */
+function ageNo(){
+
+    document.getElementById("ageGate").style.display="none";
+
+    document.getElementById("blocked").style.display="flex";
+}
+
+
+/* SHOW AD */
+function showAd(action){
+
+    adAction = action;
+
+    document.getElementById("adScreen").style.display="flex";
+
+    document.getElementById("continueBtn").style.display="none";
+
+    let seconds = 5;
+
+    let timer = document.getElementById("adTimer");
+
+    timer.innerText =
+        "Please wait " + seconds + " seconds...";
+
+    let countdown = setInterval(function(){
+
+        seconds--;
+
+        if(seconds <= 0){
+
+            clearInterval(countdown);
+
+            timer.innerText =
+                "Advertisement finished.";
+
+            document.getElementById("continueBtn")
+                .style.display="inline-block";
+
+        }else{
+
+            timer.innerText =
+                "Please wait " + seconds + " seconds...";
+
+        }
+
+    },1000);
+}
+
+
+/* AFTER AD */
+function finishAd(){
+
+    document.getElementById("adScreen").style.display="none";
+
+    if(adAction === "play"){
+
+        if(selectedVideo){
+            selectedVideo.play();
+        }
+
+    }
+}
+
+
+/* VIDEO PLAY */
+document.querySelectorAll(".myVideo").forEach(function(video){
+
+    video.addEventListener("play", function(event){
+
+        /*
+        ভিডিওকে আগে pause করে Ad দেখাবে
+        */
+        if(!video.dataset.adPassed){
+
+            event.preventDefault();
+
+            video.pause();
+
+            selectedVideo = video;
+
+            showAd("play");
+        }
+
+    });
+
+
+    /* VIDEO শেষ হলে আবার Ad */
+    video.addEventListener("ended", function(){
+
+        showAd("end");
+
+    });
+
+});
+
+</script>
+
+</body>
+  </html>
